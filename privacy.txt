@@ -1,0 +1,52 @@
+Privacy Policy
+
+Last updated: March 23, 2026
+
+Overview
+
+This browser extension is designed to block YouTube Shorts and improve your browsing experience. Your privacy is extremely important to us.
+
+Data Collection
+
+This extension does not collect, store, transmit, or share any personal data.
+
+No personal information is collected
+No browsing history is stored externally
+No analytics, tracking, or telemetry is used
+Local Storage
+
+The extension may store minimal data locally on your device to function properly.
+
+All data is stored only within your browser
+No data is sent to external servers
+Data never leaves your device
+Data Deletion
+
+You have full control over your data:
+
+Clearing your browser data will remove all stored extension data
+Uninstalling the extension will delete all associated data
+No backups or external copies of data exist
+Third-Party Services
+
+This extension:
+
+Does not use third-party services
+Does not integrate with external APIs
+Does not include advertisements or trackers
+Account Requirement
+
+No account, signup, or login is required to use this extension.
+
+Security
+
+Because no data is transmitted or stored externally, your information remains fully under your control on your local device.
+
+Changes to This Policy
+
+If this privacy policy changes, updates will be reflected in this document with a new “Last updated” date.
+
+Contact
+
+If you have questions about this privacy policy, you can open an issue on the project's GitHub repository.
+Or send an email to hoi@michielvanboven.nl
