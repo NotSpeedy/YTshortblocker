@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "YouTube Shorts Blocker",
+  "version": "1.1.0",
+  "description": "Completely blocks YouTube Shorts from appearing — with enable/disable toggle",
+  "permissions": ["*://*.youtube.com/*", "storage"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+  }
