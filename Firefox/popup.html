@@ -19,7 +19,7 @@ input:checked + .slider::before { transform: translateX(22px); }
 </style>
 </head>
 <body>
-<h2>🚫 Shorts Blocker</h2>
+<h2>Shorts Blocker</h2>
 <p>Block YouTube Shorts from appearing on all YouTube pages.</p>
 
 <div class="toggle-row">
@@ -32,27 +32,6 @@ input:checked + .slider::before { transform: translateX(22px); }
 
 <div class="status active" id="status">Shorts are being blocked</div>
 
-<script>
-const toggle = document.getElementById('toggle');
-const status = document.getElementById('status');
-const label = document.getElementById('label');
-
-function updateUI(on) {
-  toggle.checked = on;
-  label.textContent = on ? 'Enabled' : 'Disabled';
-  status.textContent = on ? 'Shorts are being blocked' : 'Blocker is paused';
-  status.className = 'status ' + (on ? 'active' : 'inactive');
-}
-
-browser.runtime.sendMessage({ type: 'getState' }).then((res) => {
-  if (res) updateUI(res.enabled);
-}).catch(() => { updateUI(true); });
-
-toggle.addEventListener('change', () => {
-  const on = toggle.checked;
-  updateUI(on);
-  browser.runtime.sendMessage({ type: 'setState', enabled: on }).catch(() => {});
-});
-</script>
+<script src="popup.js"></script>
 </body>
 </html>
