@@ -1,37 +1,240 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-body { width: 280px; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #1a1a2e; color: #e0e0e0; margin: 0; }
-h2 { margin: 0 0 12px; font-size: 16px; color: #ff4444; display: flex; align-items: center; gap: 6px; }
-p { margin: 0 0 6px; font-size: 12px; line-height: 1.5; color: #999; }
-.toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding: 12px; background: #16213e; border-radius: 10px; }
-.toggle-label { font-size: 13px; font-weight: 600; }
-.switch { position: relative; width: 48px; height: 26px; cursor: pointer; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background: #444; border-radius: 26px; transition: 0.3s; }
-.slider::before { content: ''; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
-input:checked + .slider { background: #4caf50; }
-input:checked + .slider::before { transform: translateX(22px); }
-.status { font-size: 12px; margin-top: 12px; padding: 8px 12px; border-radius: 8px; text-align: center; font-weight: 600; transition: 0.3s; }
-.status.active { background: rgba(76,175,80,0.15); color: #4caf50; }
-.status.inactive { background: rgba(255,68,68,0.15); color: #ff4444; }
-</style>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --bg-color: #0f0f0f;
+      --card-bg: #161616;
+      --accent-red: #ff0000;
+      --accent-green: #2ba640;
+      --text-main: #ffffff;
+      --text-dim: #aaaaaa;
+      --border-color: #333333;
+    }
+
+    body {
+      width: 320px;
+      padding: 20px;
+      font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      user-select: none;
+    }
+
+    /* Header & Language Switcher */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-placeholder {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .title-group h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .title-group span {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: #222;
+      padding: 4px;
+      border-radius: 20px;
+      gap: 4px;
+    }
+
+    .lang-btn {
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: #666;
+      transition: 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--accent-red);
+      color: white;
+    }
+
+    /* Description */
+    .description {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    /* Toggle Section */
+    .control-card {
+      background: var(--card-bg);
+      border: 1px solid #1e3a25; /* Subtiele groene gloed zoals screenshot */
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .control-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #label-enabled {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    #sublabel-click {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      width: 50px;
+      height: 28px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #3f3f3f;
+      transition: .3s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider { background-color: #ffffff; }
+    input:checked + .slider:before { 
+      transform: translateX(22px); 
+      background-color: #0f0f0f;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      background: rgba(43, 166, 64, 0.1);
+      border: 1px solid rgba(43, 166, 64, 0.2);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--accent-green);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #555;
+    }
+
+    .footer a { color: #555; text-decoration: none; }
+  </style>
 </head>
 <body>
-<h2>Shorts Blocker</h2>
-<p>Block YouTube Shorts from appearing on all YouTube pages.</p>
 
-<div class="toggle-row">
-  <span class="toggle-label" id="label">Enabled</span>
-  <label class="switch">
-    <input type="checkbox" id="toggle" checked>
-    <span class="slider"></span>
-  </label>
-</div>
+  <div class="header">
+    <div class="brand">
+      <div class="logo-placeholder">×</div>
+      <div class="title-group">
+        <h2>Shorts Blocker</h2>
+        <span>YouTube</span>
+      </div>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="btn-en">EN</button>
+      <button class="lang-btn" id="btn-nl">NL</button>
+    </div>
+  </div>
 
-<div class="status active" id="status">Shorts are being blocked</div>
+  <div class="description" id="text-desc">
+    Block YouTube Shorts from appearing across all YouTube pages.
+  </div>
 
-<script src="popup.js"></script>
+  <div class="control-card">
+    <div class="control-info">
+      <span id="label-enabled">Enabled</span>
+      <span id="sublabel-click">Click to pause blocking</span>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="status-bar" id="status-area">
+    <div class="status-dot"></div>
+    <span id="status-text">Shorts are being blocked</span>
+  </div>
+
+  <div class="footer">
+    <span>v1.1.0</span>
+    <a href="https://kliksafe.nl" target="_blank">kliksafe.nl</a>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>
