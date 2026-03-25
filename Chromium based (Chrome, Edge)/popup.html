@@ -1,36 +1,283 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shorts Blocker</title>
 <style>
-body { width: 280px; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #1a1a2e; color: #e0e0e0; margin: 0; }
-h2 { margin: 0 0 12px; font-size: 16px; color: #ff4444; display: flex; align-items: center; gap: 6px; }
-p { margin: 0 0 6px; font-size: 12px; line-height: 1.5; color: #999; }
-.toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding: 12px; background: #16213e; border-radius: 10px; }
-.toggle-label { font-size: 13px; font-weight: 600; }
-.switch { position: relative; width: 48px; height: 26px; cursor: pointer; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background: #444; border-radius: 26px; transition: 0.3s; }
-.slider::before { content: ''; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
-input:checked + .slider { background: #4caf50; }
-input:checked + .slider::before { transform: translateX(22px); }
-.status { font-size: 12px; margin-top: 12px; padding: 8px 12px; border-radius: 8px; text-align: center; font-weight: 600; transition: 0.3s; }
-.status.active { background: rgba(76,175,80,0.15); color: #4caf50; }
-.status.inactive { background: rgba(255,68,68,0.15); color: #ff4444; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 300px;
+    min-height: 200px;
+    background: #1c1c1e;
+    color: #f5f5f7;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 16px;
+    user-select: none;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-box {
+    width: 38px;
+    height: 38px;
+    background: #e5383b;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(229,56,59,0.35);
+  }
+
+  .header-text h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f5f5f7;
+    line-height: 1.2;
+  }
+
+  .header-text span {
+    font-size: 11px;
+    color: #8e8e93;
+    font-weight: 400;
+  }
+
+  .lang-switcher {
+    display: flex;
+    align-items: center;
+    background: #2c2c2e;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .lang-btn {
+    background: transparent;
+    border: none;
+    color: #8e8e93;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 4px 9px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    letter-spacing: 0.04em;
+  }
+
+  .lang-btn.active {
+    background: #e5383b;
+    color: #fff;
+  }
+
+  .lang-btn:not(.active):hover {
+    color: #f5f5f7;
+    background: #3a3a3c;
+  }
+
+  .description {
+    font-size: 13px;
+    color: #aeaeb2;
+    line-height: 1.55;
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+
+  .toggle-card {
+    background: #2c2c2e;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .toggle-info h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f5f5f7;
+    margin-bottom: 2px;
+  }
+
+  .toggle-info p {
+    font-size: 11px;
+    color: #8e8e93;
+    font-weight: 400;
+  }
+
+  .switch {
+    position: relative;
+    width: 51px;
+    height: 31px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #3a3a3c;
+    border-radius: 31px;
+    transition: background 0.25s;
+  }
+
+  .slider::before {
+    content: '';
+    position: absolute;
+    height: 25px;
+    width: 25px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  }
+
+  input:checked + .slider {
+    background: #34c759;
+  }
+
+  input:checked + .slider::before {
+    transform: translateX(20px);
+  }
+
+  .status-pill {
+    background: #2c2c2e;
+    border-radius: 10px;
+    padding: 11px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    transition: background 0.25s;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.25s;
+  }
+
+  .status-pill.active .status-dot {
+    background: #34c759;
+    box-shadow: 0 0 6px rgba(52,199,89,0.6);
+  }
+
+  .status-pill.inactive .status-dot {
+    background: #ff453a;
+    box-shadow: 0 0 6px rgba(255,69,58,0.5);
+  }
+
+  .status-text {
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.25s;
+  }
+
+  .status-pill.active .status-text {
+    color: #34c759;
+  }
+
+  .status-pill.inactive .status-text {
+    color: #ff453a;
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer .version {
+    font-size: 10px;
+    color: #48484a;
+    font-weight: 500;
+  }
+
+  .footer .brand {
+    font-size: 10px;
+    color: #48484a;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .footer .brand:hover {
+    color: #8e8e93;
+  }
 </style>
 </head>
 <body>
-<h2>🚫 Shorts Blocker</h2>
-<p>Block YouTube Shorts from appearing on all YouTube pages.</p>
 
-<div class="toggle-row">
-  <span class="toggle-label" id="label">Enabled</span>
-  <label class="switch">
-    <input type="checkbox" id="toggle" checked>
-    <span class="slider"></span>
-  </label>
-</div>
+  <div class="header">
+    <div class="header-left">
+      <div class="icon-box">✕</div>
+      <div class="header-text">
+        <h1 data-i18n="title">Shorts Blocker</h1>
+        <span>YouTube</span>
+      </div>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="lang-en">EN</button>
+      <button class="lang-btn" id="lang-nl">NL</button>
+    </div>
+  </div>
 
-<div class="status active" id="status">✓ Shorts are being blocked</div>
+  <p class="description" id="description">
+    Block YouTube Shorts from appearing across all YouTube pages.
+  </p>
+
+  <div class="toggle-card">
+    <div class="toggle-info">
+      <h2 id="toggle-label" data-i18n="toggleLabel">Enabled</h2>
+      <p id="toggle-sub" data-i18n="toggleSub">Click to pause blocking</p>
+    </div>
+    <label class="switch" aria-label="Toggle blocker">
+      <input type="checkbox" id="toggle" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+  
+  <div class="status-pill active" id="status-pill">
+    <div class="status-dot"></div>
+    <span class="status-text" id="status-text" data-i18n="statusActive">Shorts are being blocked</span>
+  </div>
+
+  <div class="footer">
+    <span class="version">v1.1.0</span>
+    <a class="brand" href="https://kliksafe.nl" target="_blank">kliksafe.nl</a>
+  </div>
 
 <script src="popup.js"></script>
 </body>
