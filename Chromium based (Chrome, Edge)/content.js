@@ -2,6 +2,19 @@
 (function() {
   let enabled = true;
 
+  // ─── Issue 1 fix: redirect /shorts/ pages IMMEDIATELY at document_start ───
+  // Fires before the page can load/timeout. Defaults to blocked when no value stored.
+  function maybeRedirectShorts() {
+    if (!window.location.pathname.startsWith('/shorts/')) return;
+    chrome.storage.local.get('enabled', (data) => {
+      if (chrome.runtime.lastError) return;
+      if (data.enabled !== false) {
+        window.location.replace('https://www.youtube.com/?yt-shorts-blocked=1');
+      }
+    });
+  }
+  maybeRedirectShorts();
+
   const style = document.createElement('style');
   style.id = 'yt-shorts-blocker-style';
   (document.head || document.documentElement).appendChild(style);
@@ -11,22 +24,18 @@
     ytd-rich-shelf-renderer[is-shorts],
     ytd-reel-shelf-renderer,
 
-    /* ===== SEARCH RESULTS PAGE (/results) ===== */
-    /* Shorts shelf in search */
+    /* ===== SEARCH RESULTS PAGE – Issue 2 fix ===== */
     ytd-reel-shelf-renderer.ytd-item-section-renderer,
     ytd-item-section-renderer:has(ytd-reel-shelf-renderer),
-    /* Shorts shelf with header */
     ytd-shelf-renderer:has(a[href*="/shorts/"]),
     ytd-shelf-renderer:has([title="Shorts"]),
-    ytd-shelf-renderer:has(span:not([hidden])),
-    /* Individual shorts in search results */
+    ytd-item-section-renderer:has(a[href*="/shorts/"]),
     ytd-video-renderer:has(a[href*="/shorts/"]),
     ytd-video-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]),
-    /* Shorts filter chip in search */
+    yt-horizontal-list-renderer:has(ytd-reel-item-renderer),
+    ytd-reel-item-renderer,
     yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]),
     iron-selector yt-chip-cloud-chip-renderer:has([title="Shorts"]),
-    /* Section with shorts heading */
-    ytd-item-section-renderer:has(#title:not([hidden])):has(a[href*="/shorts/"]),
 
     /* ===== TABS ===== */
     tp-yt-paper-tab:has(> .tab-content > yt-icon + .tab-title:not([hidden])):has(a[href*="shorts"]),
@@ -47,7 +56,7 @@
     /* ===== NOTIFICATIONS ===== */
     ytd-notification-renderer:has(a[href*="/shorts/"]),
 
-    /* ===== SHORTS PLAYER PAGE ===== */
+    /* ===== SHORTS PLAYER PAGE (fallback) ===== */
     ytd-shorts:has(ytd-reel-video-renderer),
     ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-clip-create"]:has(a[href*="/shorts/"]) {
       display: none !important;
@@ -74,36 +83,11 @@
     style.textContent = enabled ? CSS_RULES : '';
   }
 
+  // SPA navigation fallback: redirect if we land on /shorts/ via client-side nav
   function handleShortsPage() {
     if (!enabled) return;
-    const path = window.location.pathname;
-    if (!path.startsWith('/shorts/')) return;
-
-    const existing = document.getElementById('yt-shorts-blocked-overlay');
-    if (existing) return;
-
-    const blockedStyle = document.createElement('style');
-    blockedStyle.id = 'yt-shorts-blocked-style';
-    blockedStyle.textContent = BLOCKED_PAGE_CSS;
-    (document.head || document.documentElement).appendChild(blockedStyle);
-
-    const overlay = document.createElement('div');
-    overlay.id = 'yt-shorts-blocked-overlay';
-    overlay.className = 'yt-shorts-blocked-overlay';
-    overlay.innerHTML = `
-      <h1>🚫 Short Blocked</h1>
-      <p>YouTube Shorts are blocked by your extension.</p>
-      <a href="https://www.youtube.com">Go to YouTube Home</a>
-    `;
-
-    function inject() {
-      if (document.body) {
-        document.body.appendChild(overlay);
-      } else {
-        requestAnimationFrame(inject);
-      }
-    }
-    inject();
+    if (!window.location.pathname.startsWith('/shorts/')) return;
+    window.location.replace('https://www.youtube.com/?yt-shorts-blocked=1');
   }
 
   function removeOverlay() {
@@ -113,12 +97,20 @@
     if (blockedStyle) blockedStyle.remove();
   }
 
-  // Also hide shorts elements that load dynamically via DOM removal
+  // DOM removal fallback for elements CSS :has() may miss
   function removeShortsElements() {
     if (!enabled) return;
-    // Target reel shelves that CSS :has() might miss
-    document.querySelectorAll('ytd-reel-shelf-renderer').forEach(el => {
-      el.style.display = 'none';
+    const selectors = [
+      'ytd-reel-shelf-renderer',
+      'ytd-reel-item-renderer',
+      'ytd-video-renderer:has(a[href*="/shorts/"])',
+      'ytd-rich-item-renderer:has(a[href*="/shorts/"])',
+      'ytd-compact-video-renderer:has(a[href*="/shorts/"])',
+      'ytd-item-section-renderer:has(ytd-reel-shelf-renderer)',
+      'ytd-item-section-renderer:has(a[href*="/shorts/"])',
+    ].join(',');
+    document.querySelectorAll(selectors).forEach(el => {
+      el.style.setProperty('display', 'none', 'important');
     });
   }
 
@@ -131,7 +123,7 @@
     removeShortsElements();
   });
 
-  // Listen for state changes
+  // Listen for toggle changes from popup
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.enabled) {
       enabled = changes.enabled.newValue;
@@ -145,9 +137,13 @@
     }
   });
 
-  // Handle SPA navigation
+  // Handle SPA navigation (YouTube changes URL without full page reload)
+  let lastPath = window.location.pathname;
   const navObserver = new MutationObserver(() => {
     const path = window.location.pathname;
+    if (path === lastPath) return;
+    lastPath = path;
+
     if (path.startsWith('/shorts/') && enabled) {
       handleShortsPage();
     } else {
