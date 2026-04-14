@@ -17,20 +17,21 @@
   (document.head || document.documentElement).appendChild(style);
 
   const CSS_RULES = `
-    /* ===== HOME PAGE ===== */
+    /* ===== HOME PAGE – dedicated Shorts shelves ===== */
     ytd-rich-shelf-renderer[is-shorts],
     ytd-reel-shelf-renderer,
 
-    /* ===== SEARCH RESULTS PAGE ===== */
+    /* ===== SEARCH RESULTS – Shorts carousel row only ===== */
+    /* Do NOT hide ytd-item-section-renderer itself — it contains regular videos too */
     ytd-reel-shelf-renderer.ytd-item-section-renderer,
-    ytd-item-section-renderer:has(ytd-reel-shelf-renderer),
-    ytd-shelf-renderer:has(a[href*="/shorts/"]),
-    ytd-shelf-renderer:has([title="Shorts"]),
-    ytd-item-section-renderer:has(a[href*="/shorts/"]),
-    ytd-video-renderer:has(a[href*="/shorts/"]),
-    ytd-video-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]),
     yt-horizontal-list-renderer:has(ytd-reel-item-renderer),
     ytd-reel-item-renderer,
+
+    /* ===== SEARCH RESULTS – individual Short video rows ===== */
+    ytd-video-renderer:has(a[href*="/shorts/"]),
+    ytd-video-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]),
+
+    /* ===== FILTER CHIPS ===== */
     yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]),
     iron-selector yt-chip-cloud-chip-renderer:has([title="Shorts"]),
 
@@ -38,7 +39,7 @@
     tp-yt-paper-tab:has(> .tab-content > yt-icon + .tab-title:not([hidden])):has(a[href*="shorts"]),
     yt-tab-shape[tab-title="Shorts"],
 
-    /* ===== VIDEO ITEMS (home, channel, sidebar) ===== */
+    /* ===== VIDEO GRID / CHANNEL / HOME CARDS ===== */
     ytd-grid-video-renderer:has(a[href*="/shorts/"]),
     ytd-compact-video-renderer:has(a[href*="/shorts/"]),
     ytd-rich-item-renderer:has(a[href*="/shorts/"]),
@@ -54,8 +55,8 @@
     ytd-notification-renderer:has(a[href*="/shorts/"]),
 
     /* ===== SHORTS PLAYER PAGE (fallback) ===== */
-    ytd-shorts:has(ytd-reel-video-renderer),
-    ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-clip-create"]:has(a[href*="/shorts/"]) {
+    ytd-shorts,
+    ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-clip-create"] {
       display: none !important;
     }
   `;
@@ -89,8 +90,6 @@
         'ytd-video-renderer:has(a[href*="/shorts/"])',
         'ytd-rich-item-renderer:has(a[href*="/shorts/"])',
         'ytd-compact-video-renderer:has(a[href*="/shorts/"])',
-        'ytd-item-section-renderer:has(ytd-reel-shelf-renderer)',
-        'ytd-item-section-renderer:has(a[href*="/shorts/"])',
       ].join(',');
       document.querySelectorAll(selectors).forEach(el => {
         el.style.setProperty('display', 'none', 'important');
