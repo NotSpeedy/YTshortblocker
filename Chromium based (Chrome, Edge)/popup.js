@@ -26,7 +26,6 @@ function t(key) {
   return (TRANSLATIONS[currentLang] || TRANSLATIONS.en)[key] || key;
 }
 
-// ── Apply language to all text elements ────────────────────────────────────
 function applyLang(lang) {
   currentLang = (lang === 'nl') ? 'nl' : 'en';
 
@@ -35,7 +34,6 @@ function applyLang(lang) {
 
   document.getElementById('description').textContent = t('description');
 
-  // Re-apply toggle text with current on/off state
   var on = document.getElementById('toggle').checked;
   applyToggleText(on);
 }
@@ -49,13 +47,11 @@ function applyToggleText(on) {
   pill.className = 'status-pill ' + (on ? 'active' : 'inactive');
 }
 
-// ── Full UI update ─────────────────────────────────────────────────────────
 function updateUI(on) {
   document.getElementById('toggle').checked = on;
   applyToggleText(on);
 }
 
-// ── Chrome storage helpers ─────────────────────────────────────────────────
 function setState(on, callback) {
   chrome.runtime.sendMessage({ type: 'setState', enabled: on }, function(res) {
     if (chrome.runtime.lastError || !res || typeof res.enabled !== 'boolean') {
@@ -66,10 +62,8 @@ function setState(on, callback) {
   });
 }
 
-// ── Boot — wait for DOM to be ready ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Wire up language buttons via addEventListener (CSP-safe, no inline handlers)
   document.getElementById('lang-en').addEventListener('click', function() {
     currentLang = 'en';
     chrome.storage.local.set({ lang: 'en' });
@@ -82,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
     applyLang('nl');
   });
 
-  // Wire up toggle
   document.getElementById('toggle').addEventListener('change', function() {
     var on = this.checked;
     updateUI(on);
@@ -91,14 +84,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Load saved language + enabled state together on popup open
   chrome.storage.local.get(['enabled', 'lang'], function(data) {
     var lang = (data.lang === 'nl') ? 'nl' : 'en';
     var on   = (data.enabled !== false);
 
     currentLang = lang;
-    applyLang(lang);  // sets button active states + all translated text
-    updateUI(on);     // sets toggle checkbox + status pill
-  });
+    applyLang(lang);
+    updateUI(on);    
 
 });
