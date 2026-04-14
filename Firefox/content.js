@@ -1,20 +1,11 @@
-// YouTube Shorts Blocker - Content Script (Firefox MV2)
 (function () {
   let enabled = true;
 
-  // ── 1. Redirect /shorts/ URLs immediately (runs at document_start) ──────────
   function redirectIfShortsPage() {
     if (enabled && window.location.pathname.startsWith('/shorts/')) {
       window.location.replace('https://www.youtube.com/');
     }
   }
-
-  // ── 2. CSS does ALL the hiding — no JS DOM manipulation needed ───────────────
-  //
-  // Why CSS-only?
-  // Setting el.style or el.setAttribute from JS causes DOM mutations,
-  // which re-fires MutationObserver, which causes an infinite loop.
-  // CSS rules are applied by the browser engine and never trigger MutationObserver.
 
   const style = document.createElement('style');
   style.id = 'yt-shorts-blocker-style';
@@ -73,12 +64,6 @@
     style.textContent = enabled ? CSS_RULES : '';
   }
 
-  // ── 3. MutationObserver — redirect checks ONLY, zero DOM writes ──────────────
-  //
-  // YouTube is a SPA; the URL changes without a real page load.
-  // We need to detect those navigations to catch /shorts/ deep-links.
-  // We do NOT touch element styles here — that stays 100% in CSS.
-
   let lastPath = window.location.pathname;
 
   const observer = new MutationObserver(() => {
@@ -89,14 +74,11 @@
     }
   });
 
-  // Watch only the <title> element — YouTube always updates it on navigation.
-  // This is the narrowest possible observation: one element, characterData only.
   function startObserver() {
     const titleEl = document.querySelector('title');
     if (titleEl) {
       observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
     } else {
-      // <title> not ready yet, wait for it
       const bodyObserver = new MutationObserver(() => {
         const t = document.querySelector('title');
         if (t) {
@@ -108,7 +90,6 @@
     }
   }
 
-  // ── 4. Initialise ────────────────────────────────────────────────────────────
   redirectIfShortsPage();
   updateStyle();
   startObserver();
